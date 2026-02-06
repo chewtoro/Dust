@@ -4,7 +4,7 @@
  * Automatically selects best price across all aggregators
  */
 
-const AGGREGATOR_FEES = {
+export const AGGREGATOR_FEES = {
   '0x': 0.15,        // 0.15% affiliate fee
   '1inch': 0,        // Free, we can set our own affiliate fee
   'paraswap': 0,     // Free, partner fee optional
@@ -12,7 +12,7 @@ const AGGREGATOR_FEES = {
 };
 
 // Our service fee on top: 1.2% total - aggregator fee
-const TOTAL_SERVICE_FEE = 1.2;
+export const TOTAL_SERVICE_FEE = 1.2;
 
 /**
  * Get quote from 0x Protocol
