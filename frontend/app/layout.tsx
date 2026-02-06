@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     // Farcaster Mini App embed meta tag
     'fc:miniapp': JSON.stringify({
       version: "next",
-      imageUrl: `${APP_URL}/og.png`,
+      imageUrl: "https://i.postimg.cc/1tGgDbTF/Dust-App-Icon.png",
       button: {
         title: "Open Dust",
         action: {

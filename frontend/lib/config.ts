@@ -12,7 +12,7 @@ export const minikitConfig = {
   },
   miniapp: {
     version: "1",
-    imageUrl: `${ROOT_URL}/og.png`,
+    imageUrl: "https://i.postimg.cc/1tGgDbTF/Dust-App-Icon.png",
     name: "Dust",
     subtitle: "Sweep Your Crypto Dust",
     description: "Consolidate scattered tokens across chains into USDC or ETH on Base. No gas needed.",
