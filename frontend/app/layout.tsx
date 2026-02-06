@@ -21,6 +21,18 @@ export const metadata: Metadata = {
     'fc:frame:button:1': 'Open Dust',
     'fc:frame:button:1:action': 'launch_frame',
     'fc:frame:button:1:target': APP_URL,
+    // Farcaster Mini App embed meta tag
+    'fc:miniapp': JSON.stringify({
+      version: "next",
+      imageUrl: `${APP_URL}/og.png`,
+      button: {
+        title: "Open Dust",
+        action: {
+          type: "launch_frame",
+          url: APP_URL
+        }
+      }
+    }),
     // Base mini app
     'base:app_id': '698594c18dcaa0daf5755f4e',
   },
