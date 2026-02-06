@@ -107,7 +107,7 @@ export default function Home() {
         {/* Center Content */}
         <div className="my-auto py-20 animate-fade-in">
           <p className="text-[var(--text-secondary)] body mb-8 max-w-[280px]">
-            Sweep scattered tokens across chains into a single asset on Base.
+            Got dust in your wallet? Let us sweep it for you into a single asset on Base.
           </p>
 
           {/* Address Input */}
