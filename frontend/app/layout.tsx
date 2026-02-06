@@ -10,6 +10,9 @@ export const metadata: Metadata = {
     description: 'Consolidate crypto dust across chains to Base.',
     type: 'website',
   },
+  other: {
+    'base:app_id': '698594c18dcaa0daf5755f4e',
+  },
 };
 
 export const viewport: Viewport = {
