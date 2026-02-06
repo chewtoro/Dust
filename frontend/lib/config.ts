@@ -1,8 +1,12 @@
-export const ROOT_URL = process.env.NEXT_PUBLIC_URL || 'http://localhost:3001';
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const ROOT_URL = process.env.NEXT_PUBLIC_URL || 'https://frontend-ten-silk-23.vercel.app';
+
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-one-chi-62.vercel.app';
+
+export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0xaAa64c47e45D845FB756eB386561c883F61F8777';
 
 export const minikitConfig = {
   accountAssociation: {
+    // You'll add these after signing with Farcaster
     header: "",
     payload: "",
     signature: ""
@@ -10,22 +14,20 @@ export const minikitConfig = {
   miniapp: {
     version: "1",
     name: "Dust",
-    subtitle: "Consolidate Your Crypto Dust",
-    description: "Sweep scattered tokens across chains into USDC or ETH on Base. No gas needed.",
+    subtitle: "Sweep Your Crypto Dust",
+    description: "Consolidate scattered tokens across chains into USDC or ETH on Base. No gas needed.",
     screenshotUrls: [`${ROOT_URL}/screenshot.png`],
     iconUrl: `${ROOT_URL}/icon.png`,
     splashImageUrl: `${ROOT_URL}/splash.png`,
-    splashBackgroundColor: "#0a0a0a",
+    splashBackgroundColor: "#000000",
     homeUrl: ROOT_URL,
     webhookUrl: `${ROOT_URL}/api/webhook`,
     primaryCategory: "finance",
-    tags: ["defi", "dust", "consolidation", "base", "cross-chain"],
+    tags: ["defi", "dust", "consolidation", "swap", "base"],
     heroImageUrl: `${ROOT_URL}/hero.png`,
-    tagline: "Sweep your dust to Base",
+    tagline: "Some dust is just... dust.",
     ogTitle: "Dust - Consolidate Crypto Dust",
-    ogDescription: "Sweep scattered tokens across chains into USDC or ETH on Base",
+    ogDescription: "Sweep scattered tokens across chains into a single asset on Base.",
     ogImageUrl: `${ROOT_URL}/og.png`,
   },
 } as const;
-
-export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0xaAa64c47e45D845FB756eB386561c883F61F8777';
