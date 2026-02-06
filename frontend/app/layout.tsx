@@ -1,19 +1,22 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Providers } from './providers';
-import { minikitConfig } from '@/lib/config';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: minikitConfig.miniapp.name,
-  description: minikitConfig.miniapp.description,
+  title: 'Dust',
+  description: 'Sweep scattered tokens across chains into a single asset on Base.',
   openGraph: {
-    title: minikitConfig.miniapp.ogTitle,
-    description: minikitConfig.miniapp.ogDescription,
-    images: [minikitConfig.miniapp.ogImageUrl],
+    title: 'Dust',
+    description: 'Consolidate crypto dust across chains to Base.',
+    type: 'website',
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: '#000000',
 };
 
 export default function RootLayout({
@@ -23,7 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body>
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -3,54 +3,116 @@
 @tailwind utilities;
 
 :root {
-  --void: #0a0a0a;
-  --smoke: #1a1a1a;
-  --ash: #2a2a2a;
-  --silver: #d4d4d4;
-  --mercury: #f5f5f5;
-  --accent: #0052ff;
-  --green: #00d395;
+  --bg: #000000;
+  --surface: #0a0a0a;
+  --border: #1a1a1a;
+  --text-primary: #ffffff;
+  --text-secondary: #737373;
+  --text-tertiary: #404040;
+  --accent: #0066ff;
+  --success: #22c55e;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background: var(--void);
-  color: var(--silver);
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
   min-height: 100vh;
-  font-family: system-ui, -apple-system, sans-serif;
+  min-height: 100dvh;
 }
 
-.card {
-  background: var(--smoke);
-  border: 1px solid var(--ash);
-  border-radius: 8px;
-  padding: 16px;
-}
-
-.btn-primary {
-  background: var(--mercury);
-  color: var(--void);
-  border: none;
-  border-radius: 8px;
-  padding: 16px 24px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-primary:hover {
+::selection {
   background: var(--accent);
   color: white;
 }
 
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+/* Typography */
+.display {
+  font-size: 3.5rem;
+  font-weight: 200;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.headline {
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.body {
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.caption {
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Transitions */
+.transition-all {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Focus states */
+input:focus, button:focus {
+  outline: none;
+}
+
+input:focus-visible, button:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
+.animate-fade-in {
+  animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-pulse-slow {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 .animate-spin {
   animation: spin 1s linear infinite;
 }
+
+/* Stagger children */
+.stagger > * {
+  opacity: 0;
+  animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.stagger > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger > *:nth-child(2) { animation-delay: 0.15s; }
+.stagger > *:nth-child(3) { animation-delay: 0.2s; }
+.stagger > *:nth-child(4) { animation-delay: 0.25s; }
+.stagger > *:nth-child(5) { animation-delay: 0.3s; }
+.stagger > *:nth-child(6) { animation-delay: 0.35s; }
