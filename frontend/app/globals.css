@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --void: #0a0a0a;
+  --smoke: #1a1a1a;
+  --ash: #2a2a2a;
+  --silver: #d4d4d4;
+  --mercury: #f5f5f5;
+  --accent: #0052ff;
+  --green: #00d395;
+}
+
+body {
+  background: var(--void);
+  color: var(--silver);
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.card {
+  background: var(--smoke);
+  border: 1px solid var(--ash);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.btn-primary {
+  background: var(--mercury);
+  color: var(--void);
+  border: none;
+  border-radius: 8px;
+  padding: 16px 24px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
