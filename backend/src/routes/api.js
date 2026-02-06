@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { scanAllChains, estimateFees } from '../services/scanner.js';
+import { getBestQuote, getSwapCalldata, isTokenSupported, AGGREGATOR_FEES, TOTAL_SERVICE_FEE } from '../services/aggregators.js';
 
 const router = Router();
 
@@ -163,6 +164,119 @@ router.get('/status/:jobId', async (req, res) => {
       error: 'Status check failed',
     });
   }
+});
+
+/**
+ * POST /api/quote
+ * Get best swap quote across all aggregators
+ */
+router.post('/quote', async (req, res) => {
+  try {
+    const { chainId, sellToken, buyToken, sellAmount, takerAddress } = req.body;
+
+    if (!chainId || !sellToken || !buyToken || !sellAmount) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required parameters: chainId, sellToken, buyToken, sellAmount',
+      });
+    }
+
+    const quote = await getBestQuote(
+      parseInt(chainId),
+      sellToken,
+      buyToken,
+      sellAmount,
+      takerAddress
+    );
+
+    if (!quote) {
+      return res.status(404).json({
+        success: false,
+        error: 'No quotes available for this token pair',
+        suggestion: 'Token may not have sufficient liquidity on any aggregator',
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        bestAggregator: quote.aggregator,
+        buyAmount: quote.buyAmount.toString(),
+        netOutput: quote.netOutput.toString(),
+        aggregatorFee: quote.fee,
+        ourServiceFee: quote.ourServiceFee,
+        totalFee: TOTAL_SERVICE_FEE,
+        allQuotes: quote.allQuotes,
+      },
+    });
+  } catch (error) {
+    console.error('Quote error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get quote',
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * POST /api/check-token
+ * Check if a token is swappable via any aggregator
+ */
+router.post('/check-token', async (req, res) => {
+  try {
+    const { chainId, tokenAddress } = req.body;
+
+    if (!chainId || !tokenAddress) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required parameters: chainId, tokenAddress',
+      });
+    }
+
+    const supported = await isTokenSupported(parseInt(chainId), tokenAddress);
+
+    res.json({
+      success: true,
+      data: {
+        chainId,
+        tokenAddress,
+        supported,
+        aggregators: supported ? Object.keys(AGGREGATOR_FEES) : [],
+      },
+    });
+  } catch (error) {
+    console.error('Check token error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to check token',
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * GET /api/aggregators
+ * List supported aggregators and their fees
+ */
+router.get('/aggregators', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      aggregators: [
+        { name: '0x', fee: 0.15, description: 'DEX aggregator with wide coverage' },
+        { name: '1inch', fee: 0, description: 'Leading DEX aggregator' },
+        { name: 'paraswap', fee: 0, description: 'Multi-chain aggregator' },
+        { name: 'lifi', fee: 0, description: 'Cross-chain aggregator' },
+      ],
+      totalServiceFee: TOTAL_SERVICE_FEE,
+      feeBreakdown: {
+        aggregatorFee: 'Varies (0-0.15%)',
+        dustServiceFee: '1.05-1.2%',
+        total: '1.2%',
+      },
+    },
+  });
 });
 
 /**
