@@ -16,7 +16,7 @@ export const minikitConfig = {
     subtitle: "Sweep Your Crypto Dust",
     description: "Consolidate scattered tokens across chains into USDC or ETH on Base. No gas needed.",
     screenshotUrls: [`${ROOT_URL}/screenshot.png`],
-    iconUrl: `${ROOT_URL}/icon.png`,
+    iconUrl: "https://i.postimg.cc/1tGgDbTF/Dust-App-Icon.png",
     splashImageUrl: `${ROOT_URL}/splash.png`,
     splashBackgroundColor: "#000000",
     homeUrl: ROOT_URL,
