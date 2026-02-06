@@ -190,8 +190,11 @@ export default function Home() {
         <div className="my-auto py-16 text-center stagger">
           <p className="caption text-[var(--text-secondary)] mb-4">Recoverable</p>
           <h2 className="display mb-2">${scanResult.totalRecoverable.toFixed(2)}</h2>
-          <p className="body text-[var(--text-tertiary)]">
+          <p className="body text-[var(--text-tertiary)] mb-6">
             across {scanResult.chainCount} chain{scanResult.chainCount !== 1 ? 's' : ''}
+          </p>
+          <p className="body text-[var(--text-tertiary)] max-w-[280px] mx-auto opacity-60">
+            We swept what we could. A few crumbs were too tiny to rescue — moving them would cost more than they're worth. Some dust is just... dust.
           </p>
         </div>
 
