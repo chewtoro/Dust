@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import sdk from '@farcaster/frame-sdk';
 import { API_URL } from '@/lib/config';
 
 interface Chain {
@@ -38,6 +39,18 @@ export default function Home() {
 
   const activeAddress = address || inputAddress;
   const isValidAddress = /^0x[a-fA-F0-9]{40}$/.test(activeAddress);
+
+  // Signal to MiniKit that the app is ready
+  useEffect(() => {
+    const init = async () => {
+      try {
+        await sdk.actions.ready();
+      } catch (e) {
+        console.log('MiniKit ready call failed (expected outside frame):', e);
+      }
+    };
+    init();
+  }, []);
 
   const scan = async () => {
     if (!isValidAddress) return;
