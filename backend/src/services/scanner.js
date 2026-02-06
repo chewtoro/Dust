@@ -12,6 +12,130 @@ const ERC20_ABI = parseAbi([
 const priceCache = new Map();
 const PRICE_CACHE_TTL = 5 * 60 * 1000;
 
+// Alchemy RPC endpoints for token discovery
+const ALCHEMY_ENDPOINTS = {
+  1: 'https://eth-mainnet.g.alchemy.com/v2/',
+  137: 'https://polygon-mainnet.g.alchemy.com/v2/',
+  42161: 'https://arb-mainnet.g.alchemy.com/v2/',
+  10: 'https://opt-mainnet.g.alchemy.com/v2/',
+  8453: 'https://base-mainnet.g.alchemy.com/v2/',
+  43114: null, // Alchemy doesn't support Avalanche
+  56: null, // Alchemy doesn't support BSC
+};
+
+/**
+ * Get ALL token balances using Alchemy Token API
+ * This discovers any ERC20 token the wallet holds
+ */
+async function getAllTokenBalances(chainId, userAddress) {
+  const alchemyBase = ALCHEMY_ENDPOINTS[chainId];
+  const alchemyKey = process.env.ALCHEMY_API_KEY;
+  
+  if (!alchemyBase || !alchemyKey) {
+    return []; // Fall back to hardcoded list
+  }
+
+  try {
+    const response = await axios.post(
+      `${alchemyBase}${alchemyKey}`,
+      {
+        jsonrpc: '2.0',
+        method: 'alchemy_getTokenBalances',
+        params: [userAddress, 'erc20'],
+        id: 1,
+      }
+    );
+
+    const balances = response.data?.result?.tokenBalances || [];
+    
+    // Filter non-zero balances and get metadata
+    const nonZeroBalances = balances.filter(
+      b => b.tokenBalance && b.tokenBalance !== '0x0' && b.tokenBalance !== '0x'
+    );
+
+    // Get metadata for each token
+    const tokensWithMetadata = await Promise.all(
+      nonZeroBalances.slice(0, 50).map(async (token) => { // Limit to 50 tokens
+        try {
+          const metaResponse = await axios.post(
+            `${alchemyBase}${alchemyKey}`,
+            {
+              jsonrpc: '2.0',
+              method: 'alchemy_getTokenMetadata',
+              params: [token.contractAddress],
+              id: 1,
+            }
+          );
+          
+          const meta = metaResponse.data?.result;
+          if (!meta || !meta.symbol) return null;
+          
+          const balance = BigInt(token.tokenBalance);
+          const decimals = meta.decimals || 18;
+          const balanceNum = Number(formatUnits(balance, decimals));
+          
+          if (balanceNum === 0) return null;
+          
+          return {
+            symbol: meta.symbol,
+            name: meta.name,
+            balance: balanceNum,
+            address: token.contractAddress,
+            decimals,
+            logo: meta.logo,
+          };
+        } catch (e) {
+          return null;
+        }
+      })
+    );
+
+    return tokensWithMetadata.filter(t => t !== null);
+  } catch (error) {
+    console.error(`Alchemy token fetch error on chain ${chainId}:`, error.message);
+    return [];
+  }
+}
+
+/**
+ * Get token price from multiple sources
+ */
+async function getTokenPriceByAddress(chainId, tokenAddress) {
+  // Try CoinGecko token price by contract
+  try {
+    const platformIds = {
+      1: 'ethereum',
+      137: 'polygon-pos',
+      42161: 'arbitrum-one',
+      10: 'optimistic-ethereum',
+      8453: 'base',
+      56: 'binance-smart-chain',
+      43114: 'avalanche',
+    };
+    
+    const platform = platformIds[chainId];
+    if (!platform) return 0;
+    
+    const response = await axios.get(
+      `https://api.coingecko.com/api/v3/simple/token_price/${platform}`,
+      {
+        params: {
+          contract_addresses: tokenAddress.toLowerCase(),
+          vs_currencies: 'usd',
+        },
+        headers: process.env.COINGECKO_API_KEY 
+          ? { 'x-cg-demo-api-key': process.env.COINGECKO_API_KEY }
+          : {},
+        timeout: 5000,
+      }
+    );
+    
+    return response.data[tokenAddress.toLowerCase()]?.usd || 0;
+  } catch (error) {
+    return 0;
+  }
+}
+
 /**
  * Get token price from CoinGecko
  */
@@ -163,6 +287,7 @@ async function scanChain(chainId, userAddress) {
 
   const tokens = [];
   const gasCost = await getGasCostUSD(chainId);
+  const seenAddresses = new Set();
 
   // Check native balance
   const nativeBalance = await getNativeBalance(chainId, userAddress);
@@ -170,10 +295,35 @@ async function scanChain(chainId, userAddress) {
     tokens.push(nativeBalance);
   }
 
-  // Check common tokens
+  // Method 1: Get ALL tokens via Alchemy (discovers ATH, EIGEN, etc.)
+  const allTokens = await getAllTokenBalances(chainId, userAddress);
+  
+  for (const token of allTokens) {
+    if (seenAddresses.has(token.address.toLowerCase())) continue;
+    seenAddresses.add(token.address.toLowerCase());
+    
+    // Get price for this token
+    const price = await getTokenPriceByAddress(chainId, token.address);
+    const usdValue = token.balance * price;
+    
+    if (usdValue >= DUST_CONFIG.minValueUSD && usdValue <= DUST_CONFIG.maxValueUSD && usdValue > gasCost) {
+      tokens.push({
+        symbol: token.symbol,
+        name: token.name,
+        balance: token.balance,
+        usdValue,
+        address: token.address,
+        decimals: token.decimals,
+        logo: token.logo,
+      });
+    }
+  }
+
+  // Method 2: Also check common tokens (fallback for chains without Alchemy)
   for (const [symbol, addresses] of Object.entries(TOKENS)) {
     const tokenAddress = addresses[chainId];
-    if (!tokenAddress) continue;
+    if (!tokenAddress || seenAddresses.has(tokenAddress.toLowerCase())) continue;
+    seenAddresses.add(tokenAddress.toLowerCase());
 
     const tokenBalance = await getTokenBalance(chainId, tokenAddress, userAddress, symbol);
     if (tokenBalance && tokenBalance.usdValue > gasCost) {
