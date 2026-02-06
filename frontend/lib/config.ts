@@ -2,6 +2,7 @@ const ROOT_URL = process.env.NEXT_PUBLIC_URL || 'https://frontend-ten-silk-23.ve
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-one-chi-62.vercel.app';
 
+// Base Mainnet contract
 export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0xaAa64c47e45D845FB756eB386561c883F61F8777';
 
 export const minikitConfig = {

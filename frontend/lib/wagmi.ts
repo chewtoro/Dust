@@ -1,9 +1,10 @@
 import { http, createConfig } from 'wagmi';
-import { base, baseSepolia } from 'wagmi/chains';
+import { base } from 'wagmi/chains';
 import { coinbaseWallet, metaMask } from 'wagmi/connectors';
 
+// Base Mainnet only for production
 export const config = createConfig({
-  chains: [base, baseSepolia],
+  chains: [base],
   connectors: [
     coinbaseWallet({
       appName: 'Dust',
@@ -18,7 +19,6 @@ export const config = createConfig({
   ],
   transports: {
     [base.id]: http(),
-    [baseSepolia.id]: http(),
   },
   ssr: true,
 });
